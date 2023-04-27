@@ -2,6 +2,7 @@
 
 <template>
   <main
+  class="d-flex flex-column align-items-center"
   @keydown.up="move('up', movementAvailable)" 
   @keydown.left="move('left', movementAvailable)" 
   @keydown.right="move('right', movementAvailable)" 
