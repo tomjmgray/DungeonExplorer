@@ -6,7 +6,7 @@ const ASSET_URL = process.env.ASSET_URL || '';
 
 
 export default defineConfig({
-  base: '/DungeonEscape/',
+  base: 'https://tomjmgray.github.io/DungeonEscape/',
   plugins: [vue()],
   // server: {
   //   '/': {
