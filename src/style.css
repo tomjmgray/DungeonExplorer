@@ -1,0 +1,19 @@
+:root {
+    --dark: #333652;
+    --med: #90ADC6;
+    --light: #FAD02C;
+    --white: #E9EAEC;
+
+
+}
+
+body {
+    background-color: var(--dark);
+    color: var(--white)
+}
+
+.btn {
+    background-color: var(--med);
+    border-color: var(--med);
+    color: var(--white);
+}
