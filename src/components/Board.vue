@@ -224,11 +224,11 @@ td {
   color: white
 }
 td.dirt1{
-  background-image: url(../../public/Assets/Images/Dirt1.png);
+  background-image: url(Assets/Images/Dirt1.png);
 }
 td.dirt2 {
 
-  background-image: url(../../public/Assets/Images/Dirt2.png);
+  background-image: url(Assets/Images/Dirt2.png);
 }
 .coin {
   background-color: gold !important;
