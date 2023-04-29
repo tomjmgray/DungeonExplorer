@@ -10,19 +10,24 @@
   >
     <h1>Board</h1>
 
-    <button @click="startGame" class="btn btn-primary mb-5">Play</button>
+    <button @click="startGame" class="btn btn-primary mb-2">Play</button>
     <div id="boardContainer" class="d-flex flex-column align-items-center" style="width: 300px" v-if="board.length > 0">
       <h1 v-if="win">You Win!</h1>
       <h1 v-else-if="loss">You Lose!</h1>
       <div class="d-flex mb-5" style="min-height: 40px">
-        <span v-for="coin in coins" :key="coin" class="bigCoin"></span>
+        <img v-for="coin in coins" :key="coin" src="/projectAssets/Images/coin.png" style="width: 30px; height: 30px;" />
       </div>
 
       <table>
         <tbody>
           <tr v-for="(row, i) in board" :key="i">
-            <td v-for="(space, j) in row" :key="i * 10 + j" :class="(rand(2, 0) == 1)?'dirt1':'dirt2'">
-              <span v-if="playerX !== j || playerY !== i" :class="((coin1X == j && coin1Y == i) || (coin2X == j && coin2Y == i) || (coin3X == j && coin3Y == i))?'coin':''">{{space}}</span>
+            <td v-for="(space, j) in row" :key="i * 10 + j" :class="[
+              (rand(2, 0) == 1)?'dirt1':'dirt2',
+              ((coin1X == j && coin1Y == i) || (coin2X == j && coin2Y == i) || (coin3X == j && coin3Y == i))?'coin':'',
+               ( treasureX == j && treasureY === i && coins >= 3)?'treasure':'',
+               
+             ]">
+              <span v-if="playerX !== j || playerY !== i" >{{space}}</span>
               <i class="fa-solid fa-dragon" id="hero" v-else></i>
             </td>
           </tr>
@@ -80,6 +85,7 @@ export default {
   },
   methods:{
     startGame() {
+      this.gameStarted = false
       this.board = [];
       this.playerX = 0
       this.playerY = 0;
@@ -95,13 +101,15 @@ export default {
       this.loss = false
       this.generateBoard();
       this.placePlayer();
+      this.gameStarted = true;
+      this.tryCount = 0
     },
     generateBoard() {
       
       for (let i = 0; i < 10; i++) {
         let rowArr = [];
         for(let j = 0; j < 10; j++) {
-          rowArr.push(this.rand(5, 1))
+          rowArr.push(this.rand(4, 1))
         };
         this.board.push(rowArr)
       }
@@ -150,10 +158,10 @@ export default {
         }
       }
     },
-    evaluateMovement(direction, amount) {
+    evaluateMovement(direction, amount, x, y) {
       let good = true;
-      let pX = this.playerX;
-      let pY = this.playerY;
+      let pX = x || this.playerX;
+      let pY = y || this.playerY;
       switch(direction) {
         case 'up' :
           good = pY - amount >= 0 && (this.board[pY - amount][pX] >= 0); 
@@ -198,6 +206,7 @@ export default {
 
           break;  
       }
+      console.log(this.treasureX, this.treasureY)
       if ((this.playerX == this.treasureX && this.playerY == this.treasureY) ||
           (this.playerX == this.coin1X && this.playerY == this.coin1Y) || 
           (this.playerX == this.coin2X && this.playerY == this.coin2Y) || 
@@ -205,7 +214,43 @@ export default {
         this.setBoardPieces()
       } else {
         this.gameStarted = true
+        // this.generatePathAlgorithm()
       }
+    },
+    tryPath(x, y, pX, pY) {
+      let dirArr = ['up', 'down', 'left', 'right']
+      let dir = dirArr[this.rand(4, 0)]
+      const num = this.rand(5, 1)
+      
+      if (this.playerY == x && this.playerY == y) {
+        return
+      } else {
+        if (this.evaluateMovement(dir, num, x, y)) {
+        this.board[x][y] = num;
+        if (dir == 'up') {
+          this.tryPath(x, y-num, x, y)
+        } else if (dir == 'down') {
+          this.tryPath(x, y+num, x, y)
+        } else if (dir == 'left') {
+          this.tryPath(x-num, y, x, y)
+        } else {
+          this.tryPath(x+num, y, x, y)
+        }
+      } else {
+        this.tryCount ++;
+        if (this.tryCount > 100000) {
+          return 
+        } else {
+          this.tryPath(pX, pY, this.rand(10, 0), this.rand(10, 0))
+        }
+      }
+      }
+      
+      
+    },
+
+    generatePathAlgorithm() {
+      this.tryPath(this.treasure, this.treasureY,this.treasure, this.treasureY)
     }
   },
  
@@ -222,20 +267,27 @@ td {
   width: 30px;
   height: 30px;
   text-align: center;
-  color: white
+  color: white;
+  font-weight: 700;
 }
-td.dirt1{
-  background-image: url(Assets/Images/Dirt1.png);
+.dirt1{
+  background-image: url(projectAssets/Images/Dirt1.png);
 }
-td.dirt2 {
+.dirt2 {
 
-  background-image: url(Assets/Images/Dirt2.png);
+  background-image: url(projectAssets/Images/Dirt2.png);
 }
 .coin {
-  background-color: gold !important;
-  padding: 3px 8px;
-  
-  border-radius: 50%
+  background-image:  url(projectAssets/Images/coin.png), url(projectAssets/Images/Dirt1.png) !important;
+  background-repeat: no-repeat;
+  background-size: 30px 30px;
+  color: darkblue
+}
+.treasure {
+  background-image:  url(projectAssets/Images/chest_open.png), url(projectAssets/Images/Dirt1.png) !important;
+  background-repeat: no-repeat;
+  background-size: 30px 30px;
+
 }
 
 .bigCoin {
