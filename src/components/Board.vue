@@ -271,20 +271,20 @@ td {
   font-weight: 700;
 }
 .dirt1{
-  background-image: url(projectAssets/Images/Dirt1.png);
+  background-image: url(/projectAssets/Images/Dirt1.png);
 }
 .dirt2 {
 
-  background-image: url(projectAssets/Images/Dirt2.png);
+  background-image: url(/projectAssets/Images/Dirt2.png);
 }
 .coin {
-  background-image:  url(projectAssets/Images/coin.png), url(projectAssets/Images/Dirt1.png) !important;
+  background-image:  url(/projectAssets/Images/coin.png), url(/projectAssets/Images/Dirt1.png) !important;
   background-repeat: no-repeat;
   background-size: 30px 30px;
   color: darkblue
 }
 .treasure {
-  background-image:  url(projectAssets/Images/chest_open.png), url(projectAssets/Images/Dirt1.png) !important;
+  background-image:  url(/projectAssets/Images/chest_open.png), url(/projectAssets/Images/Dirt1.png) !important;
   background-repeat: no-repeat;
   background-size: 30px 30px;
 
