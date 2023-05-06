@@ -16,4 +16,10 @@ body {
     background-color: var(--med);
     border-color: var(--med);
     color: var(--white);
+    
+}
+
+.title {
+    color: var(--light);
+    
 }

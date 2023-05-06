@@ -8,23 +8,25 @@
   @keydown.right="move('right', movementAvailable)" 
   @keydown.down="move('down', movementAvailable)" 
   >
-    <h1>Board</h1>
+    <h1 class="title">The Noodle of Danger</h1>
 
     <button @click="startGame" class="btn btn-primary mb-2">Play</button>
     <div id="boardContainer" class="d-flex flex-column align-items-center" style="width: 300px" v-if="board.length > 0">
-      <h1 v-if="win">You Win!</h1>
-      <h1 v-else-if="loss">You Lose!</h1>
+      
+     
       <div class="d-flex mb-5" style="min-height: 40px">
         <img v-for="coin in coins" :key="coin" src="/projectAssets/Images/coin.png" style="width: 30px; height: 30px;" />
+        <img v-if="treasure && coins !== 3" src="/projectAssets/Images/chest_empty_open.png" style="width: 30px; height: 30px;" alt="">
+        <img v-if="treasure && coins == 3" src="/projectAssets/Images/chest_full_open.png" style="width: 30px; height: 30px;" alt="">
       </div>
 
       <table>
         <tbody>
           <tr v-for="(row, i) in board" :key="i">
             <td v-for="(space, j) in row" :key="i * 10 + j" :class="[
-              (rand(2, 0) == 1)?'dirt1':'dirt2',
+              ((i + j % 2) == 0)?'dirt1':'dirt2',
               ((coin1X == j && coin1Y == i) || (coin2X == j && coin2Y == i) || (coin3X == j && coin3Y == i))?'coin':'',
-               ( treasureX == j && treasureY === i && coins >= 3)?'treasure':'',
+               ( treasureX == j && treasureY === i && coins >= 3) && !treasure?'treasure':'',
                
              ]">
               <span v-if="playerX !== j || playerY !== i" >{{space}}</span>
@@ -33,7 +35,7 @@
           </tr>
         </tbody>
       </table>
-      <div id="controls" class="d-flex w-100 mt-5 flex-column align-items-center justify-content-center">
+      <div id="controls" v-if="gameStarted && !win && !loss" class="d-flex w-100 mt-5 flex-column align-items-center justify-content-center">
         <div class="row w-100 px-5">
           <div class="col-4"></div>
           <button v-if="evaluateMovement('up', movementAvailable)" @click="move('up', movementAvailable)" class="col-4 btn btn-primary"><i class="fa-solid fa-arrow-up"></i></button><div class="col-4" v-else></div>
@@ -50,12 +52,22 @@
           <div class="col-4"></div>
         </div>
       </div>
+      <div v-else-if="win" class="d-flex flex-column align-items-center">
+        <h3 >You Win!</h3>
+        <img v-if="treasure && coins == 3" src="/projectAssets/Images/chest_full_open.png" style="width: 30px; height: 30px;" alt="">
+        <p>Moves: {{moves}}</p>
+        <button class="btn btn-primary"  @click="startGame">Play Again?</button>
+      </div>
+      
+      
+      <h1 v-else-if="loss || playerMovement < 1">You Lose!</h1>
     </div>  
   </main>
   
 </template>
 
 <script >
+import pathfinder from '../../pathfinder'
 export default {
 
   name: 'Board',
@@ -79,7 +91,8 @@ export default {
       mode: 0,
       modes: ['Treasure Hunt', 'Escape', 'Endless'],
       coins: 0,
-      treasure: false
+      treasure: false,
+      moves: 0,
     }
 
   },
@@ -97,22 +110,28 @@ export default {
       this.coin3Y = 0
       this.coins = 0
       this.treasure = false;
+      this.moves = 0;
       this.win = false
       this.loss = false
       this.generateBoard();
       this.placePlayer();
+      
+      // this.generatePathAlgorithm();
       this.gameStarted = true;
       this.tryCount = 0
     },
     generateBoard() {
       
-      for (let i = 0; i < 10; i++) {
-        let rowArr = [];
-        for(let j = 0; j < 10; j++) {
-          rowArr.push(this.rand(4, 1))
-        };
-        this.board.push(rowArr)
-      }
+      const newBoard = pathfinder(
+        [this.treasureX, this.treasureY],
+        [this.coin1X, this.coin1Y],
+        [this.coin2X, this.coin2Y],
+        [this.coin2X, this.coin2Y],
+        [this.playerX, this.playerY],
+      )
+      
+      console.table(newBoard)
+      this.board = newBoard
     },
     move(direction, amount) {
       if (this.evaluateMovement(direction, amount)) {
@@ -132,7 +151,7 @@ export default {
         this.movementAvailable = currentMovement
         this.board[this.playerY][this.playerX] = null 
         if (this.playerX == this.treasureX && this.playerY == this.treasureY) {
-          this.treaure = true
+          this.treasure = true
           
         }
         if ((this.playerX == this.coin1X && this.playerY == this.coin1Y)) {
@@ -153,33 +172,69 @@ export default {
         if (this.coins == 3 && this.treasure == true) {
           this.win = true
         }
-        if (this.playerMovement === null) {
+        if (this.playerMovement == null) {
           this.lose = true
         }
+        this.moves++
       }
     },
     evaluateMovement(direction, amount, x, y) {
+      // console.log(x, y)
       let good = true;
       let pX = x || this.playerX;
       let pY = y || this.playerY;
       switch(direction) {
         case 'up' :
-          good = pY - amount >= 0 && (this.board[pY - amount][pX] >= 0); 
+          good = pY - amount >= 0
+          //  && (this.board[pY - amount][pX] >= 0)
+           ; 
           break
         case 'left' :
-          good = pX - amount >= 0 && (this.board[pX-amount][pY] >= 0) ; 
+          good = pX - amount >= 0
+          //  && (this.board[pX-amount][pY] >= 0)
+            ; 
           break
         case 'right' :
-          good = pX + amount < 10 && (this.board[pX + amount][pY] >= 0);
+          good = pX + amount < 10
+          //  && (this.board[pX + amount][pY] >= 0)
+           ;
           break
         case 'down' :
-          good =  pY + amount < 10 && (this.board[pY+amount][pX] >= 0);
+          good =  pY + amount < 10
+          //  && (this.board[pY+amount][pX] >= 0)
+           ;
+      }
+      return good
+    },
+    evlauatePlacement(dir, distance, x, y) {
+      let good = false
+      switch(dir) {
+        case 'up': 
+          if (y - distance >= 0) {
+            good = true
+          }
+          break;
+        case 'down':
+          if (y + distance < 10) {
+            good = true
+          }
+          break;
+        case 'left':
+          if (x - distance >= 0) {
+            good = true
+          }
+          break;
+        case 'right':
+          if (x + distance < 10) {
+            good = true
+          }
+          break;
       }
       return good
     },
     placePlayer() {
       // this.treasureX = this.rand(10, 0) 
-      // this.treasureY = this.rand(10, 0) 
+      // this.treasureY = this.rand(10, 0)  
       this.playerX = this.rand(10, 0)
       this.playerY = this.rand(10, 0);
       
@@ -220,37 +275,41 @@ export default {
     tryPath(x, y, pX, pY) {
       let dirArr = ['up', 'down', 'left', 'right']
       let dir = dirArr[this.rand(4, 0)]
-      const num = this.rand(5, 1)
+      let num = this.rand(5, 1)
       
       if (this.playerY == x && this.playerY == y) {
         return
       } else {
         if (this.evaluateMovement(dir, num, x, y)) {
-        this.board[x][y] = num;
-        if (dir == 'up') {
-          this.tryPath(x, y-num, x, y)
-        } else if (dir == 'down') {
-          this.tryPath(x, y+num, x, y)
-        } else if (dir == 'left') {
-          this.tryPath(x-num, y, x, y)
+          console.log(x, y)
+          this.board[x][y] = num;
+          if (dir == 'up') {
+            this.tryPath(x, y+num, x, y)
+          } else if (dir == 'down') {
+            this.tryPath(x, y-num, x, y)
+          } else if (dir == 'left') {
+            this.tryPath(x+num, y, x, y)
+          } else {
+            this.tryPath(x-num, y, x, y)
+          }
+          console.table(this.board)
         } else {
-          this.tryPath(x+num, y, x, y)
+          
+          this.tryCount ++;
+          if (this.tryCount > 10000000) {
+            console.log('MAX REACHED')
+            return 
+          } else {
+            this.tryPath(pX, pY, this.rand(10, 0), this.rand(10, 0))
+          }
         }
-      } else {
-        this.tryCount ++;
-        if (this.tryCount > 100000) {
-          return 
-        } else {
-          this.tryPath(pX, pY, this.rand(10, 0), this.rand(10, 0))
-        }
-      }
       }
       
       
     },
 
     generatePathAlgorithm() {
-      this.tryPath(this.treasure, this.treasureY,this.treasure, this.treasureY)
+      this.tryPath(this.treasureX, this.treasureY,this.treasure, this.treasureY)
     }
   },
  
@@ -284,7 +343,7 @@ td {
   color: darkblue
 }
 .treasure {
-  background-image:  url(/projectAssets/Images/chest_open.png), url(/projectAssets/Images/Dirt1.png) !important;
+  background-image:  url(/projectAssets/Images/chest_closed.png), url(/projectAssets/Images/Dirt1.png) !important;
   background-repeat: no-repeat;
   background-size: 30px 30px;
 
