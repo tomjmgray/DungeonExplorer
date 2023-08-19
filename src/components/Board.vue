@@ -8,9 +8,9 @@
   @keydown.right="move('right', movementAvailable)" 
   @keydown.down="move('down', movementAvailable)" 
   >
-    <h1 class="title">The Noodle of Danger</h1>
+    <h1 class="title my-0 py-3">The Noodle of Danger</h1>
 
-    <button @click="startGame" class="btn btn-primary mb-4">Play</button>
+    <button @click="startGame" class="btn btn-primary mb-3">Play</button>
     <div id="boardContainer" class="d-flex flex-column align-items-center" style="width: 300px" v-if="board.length > 0">
       
      
