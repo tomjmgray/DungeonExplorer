@@ -360,6 +360,8 @@ table {
 td {
   width: 30px;
   height: 30px;
+  min-width: 30px;
+  min-height: 30px;
   text-align: center;
   color: white;
   font-weight: 700;
@@ -508,7 +510,9 @@ td {
 }
 
 #hero {
-  color: green
+  color: green;
+  max-width: 30px;
+  max-height: 30px;
 }
 
 </style>
