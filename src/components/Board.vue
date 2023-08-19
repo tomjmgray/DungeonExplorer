@@ -10,21 +10,31 @@
   >
     <h1 class="title">The Noodle of Danger</h1>
 
-    <button @click="startGame" class="btn btn-primary mb-2">Play</button>
+    <button @click="startGame" class="btn btn-primary mb-4">Play</button>
     <div id="boardContainer" class="d-flex flex-column align-items-center" style="width: 300px" v-if="board.length > 0">
       
      
-      <div class="d-flex mb-5" style="min-height: 40px">
-        <img v-for="coin in coins" :key="coin" src="/projectAssets/Images/coin.png" style="width: 30px; height: 30px;" />
-        <img v-if="treasure && coins !== 3" src="/projectAssets/Images/chest_empty_open.png" style="width: 30px; height: 30px;" alt="">
-        <img v-if="treasure && coins == 3" src="/projectAssets/Images/chest_full_open.png" style="width: 30px; height: 30px;" alt="">
-      </div>
-
+      
       <table>
         <tbody>
+          <tr>
+            <td class="floor2tl"></td>
+            <td class="floor2t"></td>
+            <td class="floor2t"></td>
+            <td class="floor2t"></td>
+            <td class="floor2t"></td>
+            <td class="floor2t"></td>
+            <td class="floor2t"></td>
+            <td class="floor2t"></td>
+            <td class="floor2t"></td>
+            <td class="floor2t"></td>
+            <td class="floor2t"></td>
+            <td class="floor2tr"></td>
+          </tr>
           <tr v-for="(row, i) in board" :key="i">
+            <td class="floor2l"></td>
             <td v-for="(space, j) in row" :key="i * 10 + j" :class="[
-              ((i + j % 2) == 0)?'dirt1':'dirt2',
+              `floor2-${floorBoard[i][j] }`,
               ((coin1X == j && coin1Y == i) || (coin2X == j && coin2Y == i) || (coin3X == j && coin3Y == i))?'coin':'',
                ( treasureX == j && treasureY === i && coins >= 3) && !treasure?'treasure':'',
                
@@ -32,13 +42,33 @@
               <span v-if="playerX !== j || playerY !== i" >{{space}}</span>
               <i class="fa-solid fa-dragon" id="hero" v-else></i>
             </td>
+            <td class="floor2r"></td>
+          </tr>
+          <tr>
+            <td class="floor2bl"></td>
+            <td class="floor2b"></td>
+            <td class="floor2b"></td>
+            <td class="floor2b"></td>
+            <td class="floor2b"></td>
+            <td class="floor2b"></td>
+            <td class="floor2b"></td>
+            <td class="floor2b"></td>
+            <td class="floor2b"></td>
+            <td class="floor2b"></td>
+            <td class="floor2b"></td>
+            <td class="floor2br"></td>
           </tr>
         </tbody>
       </table>
-      <div id="controls" v-if="gameStarted && !win && !loss" class="d-flex w-100 mt-5 flex-column align-items-center justify-content-center">
+      <div class="d-flex my-3" style="min-height: 40px">
+        <img v-for="coin in coins" :key="coin" src="/projectAssets/Images/coin.png" style="width: 30px; height: 30px;" />
+        <img v-if="treasure && coins !== 3" src="/projectAssets/Images/chest_empty_open.png" style="width: 30px; height: 30px;" alt="">
+        <img v-if="treasure && coins == 3" src="/projectAssets/Images/chest_full_open.png" style="width: 30px; height: 30px;" alt="">
+      </div>
+      <div id="controls" v-if="gameStarted && !win && !loss" class="d-flex w-100  flex-column align-items-center justify-content-center">
         <div class="row w-100 px-5">
           <div class="col-4"></div>
-          <button v-if="evaluateMovement('up', movementAvailable)" @click="move('up', movementAvailable)" class="col-4 btn btn-primary"><i class="fa-solid fa-arrow-up"></i></button><div class="col-4" v-else></div>
+          <button v-if="evaluateMovement('up', movementAvailable)" @click="move('up', movementAvailable)" class="col-4 btn btn-primary"><i class="fa-solid fa-arrow-up"></i></button><div style="height: 38px;" class="col-4" v-else></div>
           <div class="col-4"></div>
         </div>
         <div class="row w-100 px-5">
@@ -54,13 +84,13 @@
       </div>
       <div v-else-if="win" class="d-flex flex-column align-items-center">
         <h3 >You Win!</h3>
-        <img v-if="treasure && coins == 3" src="/projectAssets/Images/chest_full_open.png" style="width: 30px; height: 30px;" alt="">
+        <!-- <img v-if="treasure && coins == 3" src="/projectAssets/Images/chest_full_open.png" style="width: 30px; height: 30px;" alt=""> -->
         <p>Moves: {{moves}}</p>
         <button class="btn btn-primary"  @click="startGame">Play Again?</button>
       </div>
       
       
-      <h1 v-else-if="loss || playerMovement < 1">You Lose!</h1>
+      <h1 v-else-if="loss || movementAvailable == 0">You Lose!</h1>
     </div>  
   </main>
   
@@ -93,6 +123,7 @@ export default {
       coins: 0,
       treasure: false,
       moves: 0,
+      floorBoard: [[],[],[],[],[],[],[],[],[],[]]
     }
 
   },
@@ -115,7 +146,7 @@ export default {
       this.loss = false
       this.generateBoard();
       this.placePlayer();
-      
+
       // this.generatePathAlgorithm();
       this.gameStarted = true;
       this.tryCount = 0
@@ -129,6 +160,11 @@ export default {
         [this.coin2X, this.coin2Y],
         [this.playerX, this.playerY],
       )
+      for (let i = 0; i < 10; i++) {
+        for (let j = 0; j < 10; j++) {
+          this.floorBoard[i][j] = (this.rand(6, 1))
+        }
+      }
       
       console.table(newBoard)
       this.board = newBoard
@@ -172,7 +208,7 @@ export default {
         if (this.coins == 3 && this.treasure == true) {
           this.win = true
         }
-        if (this.playerMovement == null) {
+        if (this.movementAvailable == null) {
           this.lose = true
         }
         this.moves++
@@ -337,16 +373,131 @@ td {
   background-image: url(/projectAssets/Images/Dirt2.png);
 }
 .coin {
-  background-image:  url(/projectAssets/Images/coin.png), url(/projectAssets/Images/Dirt1.png) !important;
+  background-image:  url(/projectAssets/Images/coin.png), url(/projectAssets/Images/floor_1.png) !important;
   background-repeat: no-repeat;
   background-size: 30px 30px;
   color: darkblue
 }
 .treasure {
-  background-image:  url(/projectAssets/Images/chest_closed.png), url(/projectAssets/Images/Dirt1.png) !important;
+  background-image:  url(/projectAssets/Images/chest_closed.png), url(/projectAssets/Images/floor_1.png) !important;
   background-repeat: no-repeat;
   background-size: 30px 30px;
 
+}
+
+.floor1 {
+  background-repeat: no-repeat;
+  background-size: 30px 30px;
+  background-image: url(/projectAssets/Images/floor_1.png)
+}
+
+.floor2 {
+  background-repeat: no-repeat;
+  background-size: 30px 30px;
+  background-image: url(/projectAssets/Images/floor_2.png)
+}
+.floor3 {
+  background-repeat: no-repeat;
+  background-size: 30px 30px;
+  background-image: url(/projectAssets/Images/floor_3.png)
+}
+.floor4 {
+  background-repeat: no-repeat;
+  background-size: 30px 30px;
+  background-image: url(/projectAssets/Images/floor_4.png)
+}
+.floor5 {
+  background-repeat: no-repeat;
+  background-size: 30px 30px;
+  background-image: url(/projectAssets/Images/floor_5.png)
+}
+.floor6 {
+  background-repeat: no-repeat;
+  background-size: 30px 30px;
+  background-image: url(/projectAssets/Images/floor_6.png)
+}
+.floor7 {
+  background-repeat: no-repeat;
+  background-size: 30px 30px;
+  background-image: url(/projectAssets/Images/floor_7.png)
+}
+.floor8 {
+  background-repeat: no-repeat;
+  background-size: 30px 30px;
+  background-image: url(/projectAssets/Images/floor_8.png)
+}
+
+.floor2-1 {
+  background-repeat: no-repeat;
+  background-size: 30px 30px;
+  background-image: url(/projectAssets/Images/floor2-_1.png)
+}
+
+.floor2-2 {
+  background-repeat: no-repeat;
+  background-size: 30px 30px;
+  background-image: url(/projectAssets/Images/floor2-_2.png)
+}
+.floor2-3 {
+  background-repeat: no-repeat;
+  background-size: 30px 30px;
+  background-image: url(/projectAssets/Images/floor2-_3.png)
+}
+.floor2-4 {
+  background-repeat: no-repeat;
+  background-size: 30px 30px;
+  background-image: url(/projectAssets/Images/floor2-_4.png)
+}
+.floor2-5 {
+  background-repeat: no-repeat;
+  background-size: 30px 30px;
+  background-image: url(/projectAssets/Images/floor2-_5.png)
+}
+.floor2-6 {
+  background-repeat: no-repeat;
+  background-size: 30px 30px;
+  background-image: url(/projectAssets/Images/floor2-_6.png)
+}
+
+.floor2t {
+  background-repeat: no-repeat;
+  background-size: 30px 30px;
+  background-image: url(/projectAssets/Images/floor2t.png)
+}
+.floor2tl {
+  background-repeat: no-repeat;
+  background-size: 30px 30px;
+  background-image: url(/projectAssets/Images/floor2tl.png)
+}
+.floor2tr {
+  background-repeat: no-repeat;
+  background-size: 30px 30px;
+  background-image: url(/projectAssets/Images/floor2tr.png)
+}
+.floor2l {
+  background-repeat: no-repeat;
+  background-size: 30px 30px;
+  background-image: url(/projectAssets/Images/floor2l.png)
+}
+.floor2r {
+  background-repeat: no-repeat;
+  background-size: 30px 30px;
+  background-image: url(/projectAssets/Images/floor2r.png)
+}
+.floor2b {
+  background-repeat: no-repeat;
+  background-size: 30px 30px;
+  background-image: url(/projectAssets/Images/floor2b.png)
+}
+.floor2br {
+  background-repeat: no-repeat;
+  background-size: 30px 30px;
+  background-image: url(/projectAssets/Images/floor2br.png)
+}
+.floor2bl {
+  background-repeat: no-repeat;
+  background-size: 30px 30px;
+  background-image: url(/projectAssets/Images/floor2bl.png)
 }
 
 .bigCoin {

@@ -3,8 +3,11 @@
     --med: #90ADC6;
     --light: #FAD02C;
     --white: #E9EAEC;
+}
 
-
+@font-face {
+    font-family: 'Pacifico';
+    src: url(../public/projectAssets/Fonts/Pacifico/Pacifico-Regular.ttf);
 }
 
 body {
@@ -13,13 +16,20 @@ body {
 }
 
 .btn {
-    background-color: var(--med);
+    background-color: var(--light);
+    border-color: var(--med);
+    color: var(--dark);
+    
+}
+
+.btn:hover {
     border-color: var(--med);
     color: var(--white);
-    
+    background-color: var(--med);
 }
 
 .title {
     color: var(--light);
-    
+    font-family: 'Pacifico';
+    padding: 30px 0;
 }
