@@ -354,7 +354,6 @@ export default {
 
 <style scoped>
 table {
-  border: 4px solid black;
 
 }
 
@@ -373,13 +372,13 @@ td {
   background-image: url(/projectAssets/Images/Dirt2.png);
 }
 .coin {
-  background-image:  url(/projectAssets/Images/coin.png), url(/projectAssets/Images/floor_1.png) !important;
+  background-image:  url(/projectAssets/Images/coin.png), url(/projectAssets/Images/floor2-4.png) !important;
   background-repeat: no-repeat;
   background-size: 30px 30px;
   color: darkblue
 }
 .treasure {
-  background-image:  url(/projectAssets/Images/chest_closed.png), url(/projectAssets/Images/floor_1.png) !important;
+  background-image:  url(/projectAssets/Images/chest_closed.png), url(/projectAssets/Images/floor2-4.png) !important;
   background-repeat: no-repeat;
   background-size: 30px 30px;
 
@@ -430,33 +429,33 @@ td {
 .floor2-1 {
   background-repeat: no-repeat;
   background-size: 30px 30px;
-  background-image: url(/projectAssets/Images/floor2-_1.png)
+  background-image: url(/projectAssets/Images/floor2-1.png)
 }
 
 .floor2-2 {
   background-repeat: no-repeat;
   background-size: 30px 30px;
-  background-image: url(/projectAssets/Images/floor2-_2.png)
+  background-image: url(/projectAssets/Images/floor2-2.png)
 }
 .floor2-3 {
   background-repeat: no-repeat;
   background-size: 30px 30px;
-  background-image: url(/projectAssets/Images/floor2-_3.png)
+  background-image: url(/projectAssets/Images/floor2-3.png)
 }
 .floor2-4 {
   background-repeat: no-repeat;
   background-size: 30px 30px;
-  background-image: url(/projectAssets/Images/floor2-_4.png)
+  background-image: url(/projectAssets/Images/floor2-4.png)
 }
 .floor2-5 {
   background-repeat: no-repeat;
   background-size: 30px 30px;
-  background-image: url(/projectAssets/Images/floor2-_5.png)
+  background-image: url(/projectAssets/Images/floor2-5.png)
 }
 .floor2-6 {
   background-repeat: no-repeat;
   background-size: 30px 30px;
-  background-image: url(/projectAssets/Images/floor2-_6.png)
+  background-image: url(/projectAssets/Images/floor2-6.png)
 }
 
 .floor2t {
