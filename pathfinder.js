@@ -35,7 +35,7 @@ function resetBoard(){
     })
 }
 
-export default function pathfinder(start, c1, c2, c3, p) {
+export default function pathfinder(start, c1, c2, c3, c4, c5, p) {
     console.time()
     resetBoard()
     base[start[0]][start[1]] = rand(5, 1);
@@ -43,16 +43,13 @@ export default function pathfinder(start, c1, c2, c3, p) {
     console.log('PLACED PATH',)
     console.table( base);
     let bad = false
-    // console.log(
-    //     c1, base[c1[0]][c1[1]], base[c1[0]][c1[1]] == null, 
-    //     c2, base[c2[0]][c2[1]], base[c2[0]][c2[1]] == null,
-    //     c3, base[c3[0]][c3[1]], base[c3[0]][c3[1]] == null,
-    //     p, base[p[0]][p[1]], base[p[0]][p[1]] == null
-    // )
+    
     if (
         base[c1[0]][c1[1]] == null || 
         base[c2[0]][c2[1]] == null ||
         base[c3[0]][c3[1]] == null ||
+        base[c4[0]][c4[1]] == null ||
+        base[c5[0]][c5[1]] == null ||
         base[p[0]][p[1]] == null
     ) {
         console.log('bad')
@@ -64,24 +61,13 @@ export default function pathfinder(start, c1, c2, c3, p) {
         })
         console.table(base)
         return pathfinder(start)
-        // console.table(
-        //     c1, base[c1[0]][c1[1]], base[c1[0]][c1[1]] == null, 
-        //     c2, base[c2[0]][c2[1]], base[c2[0]][c2[1]] == null,
-        //     c3, base[c3[0]][c3[1]], base[c3[0]][c3[1]] == null,
-        //     p, base[p[0]][p[1]], base[p[0]][p[1]] == null
-        // )
+        
     }
     for (let i = 0; i < 10; i++) {
         for(let j = 0; j < 10; j++) {
             if (
                 1 == 2
-                // base[i][j] == null && 
-                // ( 
-                //     (i == c1[0] && j == c1[1]) || 
-                //     (i == c2[0] && j == c2[1]) || 
-                //     (i == c3[0] && j == c3[1]) || 
-                //     (i == p[0] && j == p[1])    
-                // )
+                
                 ) {
                 return pathfinder(t)
             } else if (base[i][j] == null) {
@@ -97,12 +83,8 @@ export default function pathfinder(start, c1, c2, c3, p) {
 };
 
 function nextStep(x, y) {
-    // console.log(t)
-    // console.table(base)
     tries ++;
-    if (tries > 100000) {
-        console.log('I GIVE UP')
-        // console.table(base)
+    if (tries > 300000) {
         return
     }
     let placedStep = false;

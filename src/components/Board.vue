@@ -8,7 +8,7 @@
   @keydown.right="move('right', movementAvailable)" 
   @keydown.down="move('down', movementAvailable)" 
   >
-    <h1 class="title my-0 py-3">The Noodle of Danger</h1>
+    <h2 class="title my-0 py-3">The Noodle of Danger</h2>
 
     <button @click="startGame" class="btn btn-primary mb-3">Play</button>
     <div id="boardContainer" class="d-flex flex-column align-items-center" style="width: 300px" v-if="board.length > 0">
@@ -35,8 +35,8 @@
             <td class="floor2l"></td>
             <td v-for="(space, j) in row" :key="i * 10 + j" :class="[
               `floor2-${floorBoard[i][j] }`,
-              ((coin1X == j && coin1Y == i) || (coin2X == j && coin2Y == i) || (coin3X == j && coin3Y == i))?'coin':'',
-               ( treasureX == j && treasureY === i && coins >= 3) && !treasure?'treasure':'',
+              ((coin1X == j && coin1Y == i) || (coin2X == j && coin2Y == i) || (coin4X == j && coin4Y == i) || (coin5X == j && coin5Y == i) || (coin3X == j && coin3Y == i))?'coin':'',
+               ( treasureX == j && treasureY === i && coins >= 5) && !treasure?'treasure':'',
                
              ]">
               <span v-if="playerX !== j || playerY !== i" >{{space}}</span>
@@ -86,6 +86,7 @@
         <h3 >You Win!</h3>
         <!-- <img v-if="treasure && coins == 3" src="/projectAssets/Images/chest_full_open.png" style="width: 30px; height: 30px;" alt=""> -->
         <p>Moves: {{moves}}</p>
+        <p>Win Streak: {{winStreak}}</p>
         <button class="btn btn-primary"  @click="startGame">Play Again?</button>
       </div>
       
@@ -116,6 +117,10 @@ export default {
       coin2Y: 0,
       coin3X: 0,
       coin3Y: 0,
+      coin4X: 0,
+      coin4Y: 0,
+      coin5X: 0,
+      coin5Y: 0,
       win: false,
       loss: false,
       mode: 0,
@@ -123,7 +128,8 @@ export default {
       coins: 0,
       treasure: false,
       moves: 0,
-      floorBoard: [[],[],[],[],[],[],[],[],[],[]]
+      floorBoard: [[],[],[],[],[],[],[],[],[],[]],
+      winStreak: 0,
     }
 
   },
@@ -139,6 +145,10 @@ export default {
       this.coin2Y = 0
       this.coin3X = 0
       this.coin3Y = 0
+      this.coin4X = 0
+      this.coin4Y = 0
+      this.coin5X = 0
+      this.coin5Y = 0
       this.coins = 0
       this.treasure = false;
       this.moves = 0;
@@ -157,7 +167,9 @@ export default {
         [this.treasureX, this.treasureY],
         [this.coin1X, this.coin1Y],
         [this.coin2X, this.coin2Y],
-        [this.coin2X, this.coin2Y],
+        [this.coin3X, this.coin3Y],
+        [this.coin4X, this.coin4Y],
+        [this.coin5X, this.coin5Y],
         [this.playerX, this.playerY],
       )
       for (let i = 0; i < 10; i++) {
@@ -204,12 +216,24 @@ export default {
           this.coin3X = null;
           this.coin3Y == null;
           this.coins++
-          }
-        if (this.coins == 3 && this.treasure == true) {
+        }
+        if (this.playerX == this.coin4X && this.playerY == this.coin4Y) {
+          this.coin4X = null;
+          this.coin4Y == null;
+          this.coins++
+        }
+        if (this.playerX == this.coin5X && this.playerY == this.coin5Y) {
+          this.coin5X = null;
+          this.coin5Y == null;
+          this.coins++
+        }
+        if (this.coins == 5 && this.treasure == true) {
           this.win = true
+          this.winStreak++
         }
         if (this.movementAvailable == null) {
-          this.lose = true
+          this.loss = true
+          this.winStreak = 0
         }
         this.moves++
       }
@@ -240,6 +264,7 @@ export default {
           //  && (this.board[pY+amount][pX] >= 0)
            ;
       }
+      
       return good
     },
     evlauatePlacement(dir, distance, x, y) {
@@ -282,6 +307,64 @@ export default {
     rand(max, min) {
       return Math.floor(Math.random() * max) + min
     },
+    checkCoins(){
+      let checkAgain = false
+      if ((this.coin1X == this.coin2X && this.coin1 == this.coin2Y) ||
+           (this.coin1X == this.coin3X && this.coin1X == this.coin3Y) ||
+           (this.coin1X == this.coin4X && this.coin1X == this.coin4Y) ||
+           (this.coin1X == this.coin5X && this.coin1X == this.coin5Y) ||
+           (this.coin1X == this.treasureX && this.coin1X == this.treasureY)
+      ) {
+        this.coin1X = this.rand(10, 0);
+        this.coin1Y = this.rand(10, 0);
+        checkAgain = true
+      }
+      if ((this.coin2X == this.coin1X && this.coin2 == this.coin1Y) ||
+           (this.coin2X == this.coin3X && this.coin2X == this.coin3Y) ||
+           (this.coin2X == this.coin4X && this.coin2X == this.coin4Y) ||
+           (this.coin2X == this.coin5X && this.coin2X == this.coin5Y) ||
+           (this.coin2X == this.treasureX && this.coin2X == this.treasureY)
+      ) {
+        this.coin2X = this.rand(10, 0);
+        this.coin2Y = this.rand(10, 0);
+        checkAgain = true
+      }
+      if ((this.coin3X == this.coin1X && this.coin3 == this.coin1Y) ||
+           (this.coin3X == this.coin2X && this.coin3X == this.coin2Y) ||
+           (this.coin3X == this.coin4X && this.coin3X == this.coin4Y) ||
+           (this.coin3X == this.coin5X && this.coin3X == this.coin5Y) ||
+           (this.coin3X == this.treasureX && this.coin3X == this.treasureY)
+      ) {
+        this.coin3X = this.rand(10, 0);
+        this.coin3Y = this.rand(10, 0);
+        checkAgain = true
+      }
+      if ((this.coin4X == this.coin1X && this.coin4 == this.coin1Y) ||
+           (this.coin4X == this.coin2X && this.coin4X == this.coin2Y) ||
+           (this.coin4X == this.coin3X && this.coin4X == this.coin3Y) ||
+           (this.coin4X == this.coin5X && this.coin4X == this.coin5Y) ||
+           (this.coin4X == this.treasureX && this.coin4X == this.treasureY)
+      ) {
+        this.coin4X = this.rand(10, 0);
+        this.coin4Y = this.rand(10, 0);
+        checkAgain = true
+      }
+      if ((this.coin5X == this.coin1X && this.coin5 == this.coin1Y) ||
+           (this.coin5X == this.coin2X && this.coin5X == this.coin2Y) ||
+           (this.coin5X == this.coin3X && this.coin5X == this.coin3Y) ||
+           (this.coin5X == this.coin4X && this.coin5X == this.coin4Y) ||
+           (this.coin5X == this.treasureX && this.coin5X == this.treasureY)
+      ) {
+        this.coin5X = this.rand(10, 0);
+        this.coin5Y = this.rand(10, 0);
+        checkAgain = true
+      }
+      if (checkAgain) {
+        this.checkCoins()
+      } else {
+        return true
+      }
+    },
 
     setBoardPieces() {
       switch(this.mode) {
@@ -294,14 +377,21 @@ export default {
           this.coin2Y = this.rand(10, 0);
           this.coin3X = this.rand(10, 0);
           this.coin3Y = this.rand(10, 0);
-
+          this.coin4X = this.rand(10, 0);
+          this.coin4Y = this.rand(10, 0);
+          this.coin5X = this.rand(10, 0);
+          this.coin5Y = this.rand(10, 0);
+          this.checkCoins()
           break;  
-      }
+      };
+      
       console.log(this.treasureX, this.treasureY)
       if ((this.playerX == this.treasureX && this.playerY == this.treasureY) ||
           (this.playerX == this.coin1X && this.playerY == this.coin1Y) || 
           (this.playerX == this.coin2X && this.playerY == this.coin2Y) || 
-          (this.playerX == this.coin3X && this.playerY == this.coin3Y) ) {
+          (this.playerX == this.coin3X && this.playerY == this.coin3Y)|| 
+          (this.playerX == this.coin4X && this.playerY == this.coin4Y)|| 
+          (this.playerX == this.coin5X && this.playerY == this.coin5Y) ) {
         this.setBoardPieces()
       } else {
         this.gameStarted = true
@@ -345,7 +435,7 @@ export default {
     },
 
     generatePathAlgorithm() {
-      this.tryPath(this.treasureX, this.treasureY,this.treasure, this.treasureY)
+      this.tryPath(this.treasureX, this.treasureY,this.treasureX, this.treasureY)
     }
   },
  
